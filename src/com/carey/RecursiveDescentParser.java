@@ -2,7 +2,7 @@
  * *****************************************************************************
  * NAME: Reginald B Carey
  * EMPLID: 0316442
- * PROJECT: Recursive Descent Parser - Project 2
+ * PROJECT: An Expression Interpreter - Project 2
  * COURSE: CMSC 330 - 7980
  * SECTION: 2158
  * SEMESTER: FALL 2015
