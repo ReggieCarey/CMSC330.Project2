@@ -1,102 +1,86 @@
-#CMSC 330 - 7980 - Project #1
+#CMSC 330 - 7980 - Project #2
 
 ******************************************************************************
 
  * NAME: Reginald B Carey
  * EMPLID: 0316442
- * PROJECT: Recursive Descent Parser - Project 1
+ * PROJECT: An Expression Interpreter - Project 2
  * COURSE: CMSC 330 - 7980
  * SECTION: 2158
  * SEMESTER: FALL 2015
 
 ******************************************************************************
 
-### Instructions
+###Instructions
 
-Java Version: JDK 1.8
+##The second project involves completing and extending the C++ program that evaluates statements of an expression language contained in the module 3 case study.
 
-Test Library: JUnit 4.10
+#(Note: OK to use Java to replace C++ as your choice for this project.)
 
-To run the project from the command line, go to the ```dist``` folder and
-type one of the following:
+The statements of that expression language consist of an arithmetic expression followed by a list of assignments. Assignments are separated from the expression and each other by commas. A semicolon terminates the expression. The arithmetic expressions are fully parenthesized infix expressions containing integer literals and variables. The valid arithmetic operators are +, –, *, /. Tokens can be separated by any number of spaces. Variable names begin with an alphabetic character, followed by any number of alphanumeric characters. Variable names are case sensitive. This syntax is described by BNF and regular expressions in the case study.
 
-```bash
-$ java -jar "GUI_DSL.jar" --demo
-```
-This will generate a demonstration GUI
+The program reads in the arithmetic expression and encodes the expression as a binary tree. After the expression has been read in, the variable assignments are read in and the variables and their values of the variables are placed into the symbol table. Finally the expression is evaluated recursively.
 
-```bash
-$ java -jar "GUI_DSL.jar" --program
-```
-This will output the source code for the demonstration GUI
+Your first task is to complete the program provided by providing the three missing classes, Minus, Times and Divide.
 
-```bash
-$ cat someProgram.dsl | java -jar "GUI_DSL.jar"
-```
-This will compile and generate a GUI from standard input
-
-```bash
-$ java -jar "GUI_DSL.jar" someProgram.dsl
-```
-This will compile and generate a GUI from the file
-
-### ASSIGNMENT
-
-The first programming project involves writing a program that parses, using recursive descent, a GUI definition language defined in an input file and generates the GUI that it defines. The grammar for this language is defined below:
+Next, you should extend the program so that it supports relational, logical and conditional expression operators as defined by the following extension to the grammar:
 
 ```
-gui ::=
-    Window STRING '(' NUMBER ',' NUMBER ')' layout widgets End '.'
-layout ::=
-    Layout layout_type ':'
-layout_type ::=
-    Flow |
-    Grid '(' NUMBER ',' NUMBER [',' NUMBER ',' NUMBER] ')'
-widgets ::=
-    widget widgets |
-    widget
-widget ::=
-    Button STRING ';' |
-    Group radio_buttons End ';' |
-    Label STRING ';' |
-    Panel layout widgets End ';' |
-    Textfield NUMBER ';'
-radio_buttons ::=
-    radio_button radio_buttons |
-    radio_button
-radio_button ::=
-    Radio STRING ';'
+<exp> -> '(' <operand> <op> <operand> ')' |
+  '(' <operand> ':' <operand> '?' <operand>  ')' |
+  '(' <operand> '!' ')'
+<op> -> '+' | '-' | '*' | '/' | '>' | '<' | '=' | '&' | '|'
 ```
+Note that there are a few differences in the use of these operators compared to their customary use in the C family of languages. There differences are
 
-In the above grammar, the red symbols are non-terminals, the blue symbols are tokens and the black punctuation symbols are BNF meta-symbols. Among the tokens those in title case are keywords. The character literals are punctuation tokens.
+* In the conditional expression operator the symbols are reversed and the third operand represents the condition. The first operand is the value when true and the second the value when false
+* The logical operators use single symbols not double, for example the and operator is & not &&
+* The negation operator ! is a postfix operator, not a prefix one
+* There are only three relational operators not the usual six and the operator for equality is = not ==
+* Like C and C++ (or Java), any arithmetic expression can be interpreted as a logical value, taking 0 as false and anything else as true
 
-Below is an explanation of the meaning of some of the symbols in the above productions that should help you understand the actions that are to be performed when each of the productions is parsed:
+Your final task is to make the following two modifications to the program:
 
-In the window production the string is name that is to appear in the top border of the window and the two numbers are the width and height of the window
-In the production for layout_type that define the grid layout, the first two numbers represent the number of rows and columns, and the optional next two the horizontal and vertical gaps
-In the production for widget that defines a button, the string is the name of the button
-In the production for widget that defines a label, the string is text that is to be placed in the label
-In the production for widget that defines a text field, the number is the width of the text field
-In the production for radio_button, the string is the label of the button
-You parser should properly handle the fact that panels can be nested in other panels. Recursive productions must be implemented using recursion. Syntactically incorrect input files should detect and report the first error.
+* The program should accept input from a file, allowing for multiple expressions arranged one per line. Some hints for accomplishing this transformation will be provided in the conference
+* All results should be changed from double to int. In particular the evaluate function should return an int.
 
-Below is an example of an input file:
+You may assume that all input to the program is syntactically correct.
+
+You are to submit the source code for the entire program in a .zip file. Your program must compile with Microsoft Visual C++.
+
+(Note: You may use Java to replace C++ as your choice for this project. Your Java program must compile with the JDK tools or Netbeans/Eclipse IDEs.)
+
+------
+
+###Module 3: Imperative Languages—Control Flow
+
+##An Expression Interpreter
+
+The case study for this module incorporates two of the language features that we discussed—expressions and assignments. The program interprets fully parenthesized arithmetic expressions that contain either literal values or variables. The variables must then subsequently be assigned values.
+
+The grammar for the language that this interpreter accepts is defined by the following grammar:
 
 ```
-Window "Calculator" (200, 200) Layout Flow:
-  Textfield 20;
-  Panel Layout Grid(4, 3, 5, 5):
-    Button "7";
-    Button "8";
-    Button "9";
-    Button "4";
-    Button "5";
-    Button "6";
-    Button "1";
-    Button "2";
-    Button "3";
-    Label "";
-    Button "0";
-  End;
-End.
+<program> → <exp> , <assigns> ;
+<exp> → ( <operand> <op> <operand> )
+<operand> → <literal> | <variable> | <exp>
+<assigns> → <assigns> , <assign> | <assign>
+<assign> → <variable> = <literal>
 ```
+
+The regular expressions defining the three tokens are the following:
+
+```
+<op>		[+-*/]
+<variable>	[a-zA-Z][a-zA-Z0-9]*
+<literal>	[0-9]+
+```
+
+So, if you were to enter the following expression:
+
+```(x + (y * 3)), x = 2, y = 6;```
+
+the interpreter would respond:
+
+```Value = 20```
+
