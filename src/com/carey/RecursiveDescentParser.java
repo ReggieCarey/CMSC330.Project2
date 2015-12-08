@@ -11,29 +11,20 @@
 package com.carey;
 
 import static com.carey.Type.BEGINOFINPUT;
-import static com.carey.Type.BUTTON;
+import static com.carey.Type.BEGINOFLINE;
 import static com.carey.Type.COLON;
 import static com.carey.Type.COMMA;
-import static com.carey.Type.END;
-import static com.carey.Type.ENDGROUP;
 import static com.carey.Type.ENDOFINPUT;
-import static com.carey.Type.ENDPANEL;
-import static com.carey.Type.ENDWINDOW;
-import static com.carey.Type.FLOW;
-import static com.carey.Type.GRID;
-import static com.carey.Type.GROUP;
-import static com.carey.Type.LABEL;
-import static com.carey.Type.LAYOUT;
+import static com.carey.Type.ENDOFLINE;
+import static com.carey.Type.EQUALS;
+import static com.carey.Type.LITERAL;
 import static com.carey.Type.LPAREN;
-import static com.carey.Type.NUMBER;
-import static com.carey.Type.PANEL;
-import static com.carey.Type.PERIOD;
-import static com.carey.Type.RADIO;
+import static com.carey.Type.NOT;
+import static com.carey.Type.OP;
+import static com.carey.Type.QUESTION;
 import static com.carey.Type.RPAREN;
 import static com.carey.Type.SEMICOLON;
-import static com.carey.Type.STRING;
-import static com.carey.Type.TEXTFIELD;
-import static com.carey.Type.WINDOW;
+import static com.carey.Type.VARIABLE;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
@@ -71,7 +62,7 @@ public class RecursiveDescentParser {
         try {
             lex = new LexicalScanner(stream);
             emitter = new Emitter();
-            gui();
+            program();
         } finally {
             if (stream != null) {
                 stream.close();
@@ -105,192 +96,69 @@ public class RecursiveDescentParser {
         parse(new FileReader(file));
     }
 
-    /**
-     * Recursive Descent Parser for gui. Parses gui as per the grammar:
-     *
-     * gui ::= Window STRING '(' NUMBER ',' NUMBER ')' layout widgets End '.'
-     *
-     * @throws IOException On problems reading the reader
-     * @throws SyntaxException On any token parsing error
-     * @throws ParseException On any structural parsing error
-     */
-    private void gui() throws IOException, SyntaxException, ParseException {
-        matchThenAdvance(BEGINOFINPUT);
-        matchThenAdvance(WINDOW);
-        String windowName = matchThenAdvance(STRING).getContent();
-        matchThenAdvance(LPAREN);
-        int width = Integer.parseInt(matchThenAdvance(NUMBER).getContent());
+    private void program() throws IOException, SyntaxException, ParseException {
+        emitter.emit(matchThenAdvance(BEGINOFINPUT).getType());
+        lines();
+        emitter.emit(matchThenAdvance(ENDOFINPUT).getType());
+    }
+
+    private void lines() throws IOException, SyntaxException, ParseException {
+        line();
+        try {
+            lines();
+        } catch (ParseException ex) {
+        }
+    }
+
+    private void line() throws IOException, SyntaxException, ParseException {
+        emitter.emit(BEGINOFLINE);
+        exp();
         matchThenAdvance(COMMA);
-        int height = Integer.parseInt(matchThenAdvance(NUMBER).getContent());
-        matchThenAdvance(RPAREN);
-        emitter.emit(WINDOW, windowName, width, height);
-        layout();
-        widgets();
-        matchThenAdvance(END);
-        emitter.emit(ENDWINDOW);
-        matchThenAdvance(PERIOD);
-        match(ENDOFINPUT);
-        emitter.emit(ENDOFINPUT);
-    }
-
-    /**
-     * Recursive Descent Parser for layout. Parses layout as per the grammar:
-     *
-     * layout ::= Layout layout_type ':'
-     *
-     * @throws IOException On problems reading the reader
-     * @throws SyntaxException On any token parsing error
-     * @throws ParseException On any structural parsing error
-     */
-    private void layout() throws IOException, SyntaxException, ParseException {
-        matchThenAdvance(LAYOUT);
-        layout_type();
-        matchThenAdvance(COLON);
-        emitter.emit(LAYOUT);
-    }
-
-    /**
-     * Recursive Descent Parser for layout_type. Parses layout_type as per the
-     * grammar:
-     *
-     * layout_type ::= Flow | Grid '(' NUMBER ',' NUMBER [',' NUMBER ',' NUMBER]
-     * ')'
-     *
-     * @throws IOException On problems reading the reader
-     * @throws SyntaxException On any token parsing error
-     * @throws ParseException On any structural parsing error
-     */
-    private void layout_type() throws IOException, SyntaxException, ParseException {
-        Token token = matchThenAdvance(FLOW, GRID);
-
-        if (FLOW == token.getType()) {
-            emitter.emit(FLOW);
-        }
-
-        if (GRID == token.getType()) {
-            int rows, cols;
-            matchThenAdvance(LPAREN);
-            rows = Integer.parseInt(matchThenAdvance(NUMBER).getContent());
-            matchThenAdvance(COMMA);
-            cols = Integer.parseInt(matchThenAdvance(NUMBER).getContent());
-            if (doesMatchThenAdvance(COMMA) != null) {
-                int hgap, vgap;
-                hgap = Integer.parseInt(matchThenAdvance(NUMBER).getContent());
-                matchThenAdvance(COMMA);
-                vgap = Integer.parseInt(matchThenAdvance(NUMBER).getContent());
-                emitter.emit(GRID, rows, cols, hgap, vgap);
-            } else {
-                emitter.emit(GRID, rows, cols);
-            }
-            matchThenAdvance(RPAREN);
-        }
-    }
-
-    /**
-     * Recursive Descent Parser for widgets. Parses widgets as per the grammar:
-     *
-     * widgets ::= widget widgets | widget
-     *
-     * NOTE: We COULD take advantage of tail recursion optimization and convert
-     * to a loop.
-     *
-     * @throws IOException On problems reading the reader
-     * @throws SyntaxException On any token parsing error
-     * @throws ParseException On any structural parsing error
-     */
-    private void widgets() throws IOException, SyntaxException, ParseException {
-        widget();
-        try {
-            widgets();
-        } catch (ParseException ex) {
-        }
-    }
-
-    /**
-     * Recursive Descent Parser for widget. Parses widget as per the grammar:
-     *
-     * widget ::= Button STRING ';' | Group radio_buttons End ';' | Label STRING
-     * ';' | Panel layout widgets End ';' | Textfield NUMBER ';'
-     *
-     * @throws IOException On problems reading the reader
-     * @throws SyntaxException On any token parsing error
-     * @throws ParseException On any structural parsing error
-     */
-    private void widget() throws IOException, SyntaxException, ParseException {
-        Token token = matchThenAdvance(BUTTON, GROUP, LABEL, PANEL, TEXTFIELD);
-
-        if (BUTTON == token.getType()) {
-            String buttonText = matchThenAdvance(STRING).getContent();
-            matchThenAdvance(SEMICOLON);
-            emitter.emit(BUTTON, buttonText);
-        }
-
-        if (GROUP == token.getType()) {
-            emitter.emit(GROUP);
-            radio_buttons();
-            matchThenAdvance(END);
-            matchThenAdvance(SEMICOLON);
-            emitter.emit(ENDGROUP);
-        }
-
-        if (LABEL == token.getType()) {
-            String labelText = matchThenAdvance(STRING).getContent();
-            matchThenAdvance(SEMICOLON);
-            emitter.emit(LABEL, labelText);
-        }
-
-        if (PANEL == token.getType()) {
-            emitter.emit(PANEL);
-            layout();
-            widgets();
-            matchThenAdvance(END);
-            matchThenAdvance(SEMICOLON);
-            emitter.emit(ENDPANEL);
-        }
-
-        if (TEXTFIELD == token.getType()) {
-            int columns = Integer.parseInt(matchThenAdvance(NUMBER).getContent());
-            matchThenAdvance(SEMICOLON);
-            emitter.emit(TEXTFIELD, columns);
-        }
-    }
-
-    /**
-     * Recursive Descent Parser for radio_buttons. Parses radio_buttons as per
-     * the grammar:
-     *
-     * radio_buttons ::= radio_button radio_buttons | radio_button
-     *
-     * NOTE: We COULD take advantage of tail recursion optimization and convert
-     * to a loop.
-     *
-     * @throws IOException On problems reading the reader
-     * @throws SyntaxException On any token parsing error
-     * @throws ParseException On any structural parsing error
-     */
-    private void radio_buttons() throws IOException, SyntaxException, ParseException {
-        radio_button();
-        try {
-            radio_buttons();
-        } catch (ParseException ex) {
-        }
-    }
-
-    /**
-     * Recursive Descent Parser for radio_button. Parses radio_button as per the
-     * grammar:
-     *
-     * radio_button ::= Radio STRING ';'
-     *
-     * @throws IOException On problems reading the reader
-     * @throws SyntaxException On any token parsing error
-     * @throws ParseException On any structural parsing error
-     */
-    private void radio_button() throws IOException, SyntaxException, ParseException {
-        matchThenAdvance(RADIO);
-        String name = matchThenAdvance(STRING).getContent();
+        assigns();
         matchThenAdvance(SEMICOLON);
-        emitter.emit(RADIO, name);
+        emitter.emit(ENDOFLINE);
+    }
+
+    private void exp() throws IOException, SyntaxException, ParseException {
+        matchThenAdvance(LPAREN);
+        operand();
+        Token operator = matchThenAdvance(OP, COLON, NOT, EQUALS);
+        if (COLON.equals(operator.getType())) {
+            operand();
+            matchThenAdvance(QUESTION);
+            operand();
+        } else if (OP.equals(operator.getType()) || EQUALS.equals(operator.getType())) {
+            operand();
+        }
+        matchThenAdvance(RPAREN);
+        emitter.emit(OP, operator.getContent());
+    }
+
+    private void operand() throws IOException, SyntaxException, ParseException {
+        try {
+            Token token = matchThenAdvance(VARIABLE, LITERAL);
+            emitter.emit(token.getType(), token.getContent());
+        } catch (ParseException ex) {
+            exp();
+        }
+    }
+
+    private void assigns() throws IOException, SyntaxException, ParseException {
+        assign();
+        try {
+            matchThenAdvance(COMMA);
+            assigns();
+        } catch (ParseException ex) {
+        }
+    }
+
+    private void assign() throws IOException, SyntaxException, ParseException {
+        Token variable = matchThenAdvance(VARIABLE);
+        Token equals = matchThenAdvance(EQUALS);
+        Token literal = matchThenAdvance(LITERAL);
+        emitter.emit(VARIABLE, variable.getContent());
+        emitter.emit(LITERAL, literal.getContent());
+        emitter.emit(EQUALS, equals.getContent());
     }
 
     /**

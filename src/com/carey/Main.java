@@ -30,49 +30,14 @@ public class Main {
      */
     public static void main(String[] args) {
 
-        String demoProgram = ""
-                + "Window \"Calculator\" (300, 300) Layout Flow:\n"
-                + "  Textfield 20;\n"
-                + "  Panel Layout Grid(2,1):\n"
-                + "    Panel Layout Flow: "
-                + "      Group\n"
-                + "        Radio \"Basic\";\n"
-                + "        Radio \"Scientific\";\n"
-                + "        Radio \"Programmer\";\n"
-                + "      End;\n"
-                + "    End;\n"
-                + "    Label \"CMSC 330 - Reggie Carey\";\n"
-                + "  End;\n"
-                + "  Panel Layout Grid(5, 4, 5, 5):\n"
-                + "    Button \"AC\";\n"
-                + "    Button \"+/-\";\n"
-                + "    Button \"%\";\n"
-                + "    Button \"/\";\n"
-                + "    \n"
-                + "    Button \"7\";\n"
-                + "    Button \"8\";\n"
-                + "    Button \"9\";\n"
-                + "    Button \"*\";\n"
-                + "    \n"
-                + "    Button \"4\";\n"
-                + "    Button \"5\";\n"
-                + "    Button \"6\";\n"
-                + "    Button \"-\";\n"
-                + "    \n"
-                + "    Button \"1\";\n"
-                + "    Button \"2\";\n"
-                + "    Button \"3\";\n"
-                + "    Button \"+\";\n"
-                + "    \n"
-                + "    Button \"0\";\n"
-                + "    Label \"\";\n"
-                + "    Button \".\";\n"
-                + "    Button \"=\";\n"
-                + "  End;\n"
-                + "End.";
-
+        String demoProgram =
+        "(x:y?(z|(q!))), z=1,x=10,y=20,q=1;\n" +
+        "(x:y?(z|(q!))), z=1,x=10,y=20,q=0;\n" +
+        "(x:y?(z|(q!))), z=0,x=10,y=20,q=1;\n" +
+        "(x:y?(z|(q!))), z=0,x=10,y=20,q=0\n;"
+                ;
         RecursiveDescentParser parser = new RecursiveDescentParser();
-
+        Integer a = 7;Integer b=3;
         try {
             if (args.length == 0) {
                 parser.parse(new InputStreamReader(System.in));
