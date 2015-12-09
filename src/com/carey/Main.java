@@ -30,14 +30,15 @@ public class Main {
      */
     public static void main(String[] args) {
 
-        String demoProgram =
-        "(x:y?(z|(q!))), z=1,x=10,y=20,q=1;\n" +
-        "(x:y?(z|(q!))), z=1,x=10,y=20,q=0;\n" +
-        "(x:y?(z|(q!))), z=0,x=10,y=20,q=1;\n" +
-        "(x:y?(z|(q!))), z=0,x=10,y=20,q=0\n;"
-                ;
+        String demoProgram
+                = "(x + (y * 3)), x = 2, y = 6;"
+                + "(x:y?(z|(q!))), z=1,x=10,y=20,q=1;\n"
+                + "(x:y?(z|(q!))), z=1,x=10,y=20,q=0;\n"
+                + "(x:y?(z|(q!))), z=0,x=10,y=20,q=1;\n"
+                + "(x:y?(z|(q!))), z=0,x=10,y=20,q=0\n;";
         RecursiveDescentParser parser = new RecursiveDescentParser();
-        Integer a = 7;Integer b=3;
+        Integer a = 7;
+        Integer b = 3;
         try {
             if (args.length == 0) {
                 parser.parse(new InputStreamReader(System.in));

@@ -86,9 +86,10 @@ class Emitter {
                 symbolTable.put((String) variable, (Integer) literal);
             }
 
-            // When we read the endofline, we are ready to evaluate the parseStack using the symbolTable
+            // When we read the endofline, we are ready to evaluate the parsingStack using the symbolTable
             if (ENDOFLINE.equals(cmd)) {
-                evaluate();
+                int value = evaluate();
+                System.out.println("Value = " + value);
             }
 
         } catch (ClassCastException ex) {
@@ -105,7 +106,7 @@ class Emitter {
     }
 
     /**
-     * Evaluate the contents of the parsingStack. This method will traverse the
+     * Evaluate the contents of the parsingStack. This method will consume the
      * parsing stack in reverse order and evaluate the contents. Whenever a
      * variable is encountered it is replaced with the value in the symbol
      * stack. We implement a stack machine for the evaluation of expressions. As
@@ -116,8 +117,10 @@ class Emitter {
      * @throws ParseException is thrown when a variable not in the symbol table
      * is found
      */
-    private void evaluate() throws ParseException {
+    private int evaluate() throws ParseException {
+
         LinkedList<Integer> args = new LinkedList();
+
         while (!parsingStack.isEmpty()) {
 
             Object element = parsingStack.removeLast();
@@ -226,7 +229,7 @@ class Emitter {
         }
 
         // The top of the arg stack now contains the computed result.
-        System.out.println("Value = " + args.pop());
+        return args.pop();
     }
 
 }

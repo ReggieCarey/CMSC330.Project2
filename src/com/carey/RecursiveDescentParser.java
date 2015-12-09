@@ -34,13 +34,34 @@ import java.util.Arrays;
 
 /**
  * This class implements a Recursive Descent Parser. It parses the grammar as
- * specified in the Project 1 homework assignment. This grammar is intended to
- * represent a domain specific language designed to generate graphical user
- * interfaces.
+ * specified in the Project 2 homework assignment. This grammar is intended to
+ * represent a domain specific language designed to provide an expression
+ * interpreter.
  *
- * This code will act like an interpreter in that it will directly generate the
- * GUI using Java SWING API's instead of generating the Java Source Code to
- * produce the GUI.
+ * This code will act like an interpreter in that it will evaluate the
+ * expressions.
+ *
+ * The grammar for the language that this interpreter accepts is defined by the following grammar:
+ *
+ * <pre>{@code
+ * <program> → <lines>
+ * <lines> → <line> | <line> <lines>
+ * <line> → <exp> , <assigns> ;
+ * <exp> → ( <operand> <op> <operand> ) |
+ *         ( <operand> : <operand> ? <operand> ) |
+ *         ( <operand> ! )
+ * <operand> → <literal> | <variable> | <exp>
+ * <assigns> → <assigns> , <assign> | <assign>
+ * <assign> → <variable> = <literal>
+ * }</pre>
+ *
+ * The regular expressions defining the three tokens are the following:
+ *
+ * <pre>{@code
+ * <op>         '+' | '-' | '*' | '/' | '>' | '<' | '=' | '&' | '|'
+ * <variable>	[a-zA-Z][a-zA-Z0-9]*
+ * <literal>	[0-9]+
+ * }</pre>
  *
  * @author ReginaldCarey
  */
@@ -50,8 +71,9 @@ public class RecursiveDescentParser {
     private Emitter emitter;
 
     /**
-     * Parse a program from a Reader producing a GUI. This method will parse the
-     * contents of a Reader and generate a GUI based on the content.
+     * Parse a program from a Reader producing a evaluation result. This method
+     * will parse the contents of a Reader and generate an expression evaluation
+     * result.
      *
      * @param stream A basic reader containing the content to parse.
      * @throws IOException On problems consuming the reader
@@ -71,8 +93,9 @@ public class RecursiveDescentParser {
     }
 
     /**
-     * Parse a program from a String producing a GUI. This method will parse the
-     * contents of a String and generate a GUI based on the content.
+     * Parse a program from a String producing a evaluation result. This method
+     * will parse the contents of a Reader and generate an expression evaluation
+     * result.
      *
      * @param content A string containing the content to parse.
      * @throws IOException On problems consuming the string
@@ -84,8 +107,9 @@ public class RecursiveDescentParser {
     }
 
     /**
-     * Parse a program from a File producing a GUI. This method will parse the
-     * contents of a File and generate a GUI based on the content.
+     * Parse a program from a File producing a evaluation result. This method
+     * will parse the contents of a Reader and generate an expression evaluation
+     * result.
      *
      * @param file A file containing the content to parse.
      * @throws IOException On problems consuming the file
