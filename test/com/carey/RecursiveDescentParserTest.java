@@ -43,46 +43,7 @@ public class RecursiveDescentParserTest {
 
     @Before
     public void setUp() {
-        program = "             \n"
-                + "Window \"Calculator\" (300, 300) Layout Flow:\n"
-                + "  Textfield 20;\n"
-                + "  Panel Layout Grid(2,1):\n"
-                + "    Panel Layout Flow: "
-                + "      Group\n"
-                + "        Radio \"Basic\";\n"
-                + "        Radio \"Scientific\";\n"
-                + "        Radio \"Programmer\";\n"
-                + "      End;\n"
-                + "    End;\n"
-                + "    Label \"CMSC 330 - Reggie Carey\";\n"
-                + "  End;\n"
-                + "  Panel Layout Grid(5, 4, 5, 5):\n"
-                + "    Button \"AC\";\n"
-                + "    Button \"+/-\";\n"
-                + "    Button \"%\";\n"
-                + "    Button \"/\";\n"
-                + "    \n"
-                + "    Button \"7\";\n"
-                + "    Button \"8\";\n"
-                + "    Button \"9\";\n"
-                + "    Button \"*\";\n"
-                + "    \n"
-                + "    Button \"4\";\n"
-                + "    Button \"5\";\n"
-                + "    Button \"6\";\n"
-                + "    Button \"-\";\n"
-                + "    \n"
-                + "    Button \"1\";\n"
-                + "    Button \"2\";\n"
-                + "    Button \"3\";\n"
-                + "    Button \"+\";\n"
-                + "    \n"
-                + "    Button \"0\";\n"
-                + "    Label \"\";\n"
-                + "    Button \".\";\n"
-                + "    Button \"=\";\n"
-                + "  End;\n"
-                + "End.";
+        program = "(x + (y * 3)), x = 2, y = 6;";
     }
 
     @After
@@ -99,7 +60,7 @@ public class RecursiveDescentParserTest {
         RecursiveDescentParser instance = new RecursiveDescentParser();
         try {
             instance.parse(stream);
-            System.out.println("A GUI WAS GENERATED");
+            System.out.println("Output should have been 'Value = 20'");
         } catch (IOException | SyntaxException | ParseException ex) {
             fail("Unexpected exception : " + ex);
         }
@@ -115,7 +76,7 @@ public class RecursiveDescentParserTest {
         RecursiveDescentParser instance = new RecursiveDescentParser();
         try {
             instance.parse(content);
-            System.out.println("A GUI WAS GENERATED");
+            System.out.println("Output should have been 'Value = 20'");
         } catch (IOException | SyntaxException | ParseException ex) {
             fail("Unexpected exception : " + ex);
         }
@@ -137,7 +98,7 @@ public class RecursiveDescentParserTest {
         RecursiveDescentParser instance = new RecursiveDescentParser();
         try {
             instance.parse(file);
-            System.out.println("A GUI WAS GENERATED");
+            System.out.println("Output should have been 'Value = 20'");
         } catch (IOException | SyntaxException | ParseException ex) {
             fail("Unexpected exception : " + ex);
         }

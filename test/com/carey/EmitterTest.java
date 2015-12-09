@@ -10,10 +10,10 @@
  */
 package com.carey;
 
-import static com.carey.Type.ENDWINDOW;
-import static com.carey.Type.WINDOW;
+import static com.carey.Type.ENDOFLINE;
+import static com.carey.Type.LITERAL;
+import static com.carey.Type.OP;
 import java.util.Collection;
-import javax.swing.JFrame;
 import org.junit.After;
 import org.junit.AfterClass;
 import static org.junit.Assert.assertEquals;
@@ -57,21 +57,23 @@ public class EmitterTest {
         Emitter instance = new Emitter();
         Collection parsingStack = instance.getParsingStack();
 
-        Type cmd = WINDOW;
-        Object[] args = {"Goober", 42, 16};
-        instance.emit(cmd, args);
+        instance.emit(LITERAL, "10");
 
         Object expected = 1;
         Object actual = parsingStack.size();
         assertEquals("The stack is missing an object", expected, actual);
 
-        expected = JFrame.class;
-        actual = parsingStack.toArray()[0].getClass();
-        assertEquals("The stack should show a jFrame", expected, actual);
+        instance.emit(LITERAL, "20");
+        expected = 2;
+        actual = parsingStack.size();
+        assertEquals("The stack is missing an object", expected, actual);
 
-        cmd = ENDWINDOW;
-        instance.emit(cmd);
+        instance.emit(OP, "+");
+        expected = 3;
+        actual = parsingStack.size();
+        assertEquals("The stack is missing an object", expected, actual);
 
+        instance.emit(ENDOFLINE);
         expected = 0;
         actual = parsingStack.size();
         assertEquals("The stack should be empty", expected, actual);

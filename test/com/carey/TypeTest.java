@@ -10,8 +10,8 @@
  */
 package com.carey;
 
-import static com.carey.Type.STRING;
-import static com.carey.Type.WINDOW;
+import static com.carey.Type.LITERAL;
+import static com.carey.Type.VARIABLE;
 import org.junit.After;
 import org.junit.AfterClass;
 import static org.junit.Assert.assertEquals;
@@ -51,13 +51,13 @@ public class TypeTest {
     public void testGetMatcher() {
         System.out.println("getMatcher");
         CharSequence charSequence = "Window to the stars";
-        Type instance = WINDOW;
+        Type instance = VARIABLE;
         boolean expResult = true;
         boolean result = instance.getMatcher(charSequence).lookingAt();
         assertEquals(expResult, result);
 
-        charSequence = "\"Window\" to the stars";
-        instance = STRING;
+        charSequence = "123 to the stars";
+        instance = LITERAL;
         expResult = true;
         result = instance.getMatcher(charSequence).lookingAt();
         assertEquals(expResult, result);

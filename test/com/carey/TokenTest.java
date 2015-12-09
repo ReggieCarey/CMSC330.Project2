@@ -10,7 +10,7 @@
  */
 package com.carey;
 
-import static com.carey.Type.STRING;
+import static com.carey.Type.VARIABLE;
 import org.junit.After;
 import org.junit.AfterClass;
 import static org.junit.Assert.assertEquals;
@@ -49,8 +49,8 @@ public class TokenTest {
     @Test
     public void testGetContent() {
         System.out.println("getContent");
-        Token instance = new Token(STRING, "The world at your fingers", 10, 20);
-        String expResult = "The world at your fingers";
+        Token instance = new Token(VARIABLE, "TheFingers", 10, 20);
+        String expResult = "TheFingers";
         String result = instance.getContent();
         assertEquals(expResult, result);
     }
@@ -61,8 +61,8 @@ public class TokenTest {
     @Test
     public void testGetType() {
         System.out.println("getType");
-        Token instance = new Token(STRING, "The world at your fingers", 10, 20);
-        Type expResult = STRING;
+        Token instance = new Token(VARIABLE, "TheFingers", 10, 20);
+        Type expResult = VARIABLE;
         Type result = instance.getType();
         assertEquals(expResult, result);
     }
@@ -73,7 +73,7 @@ public class TokenTest {
     @Test
     public void testGetLineNumber() {
         System.out.println("getLineNumber");
-        Token instance = new Token(STRING, "The world at your fingers", 10, 20);
+        Token instance = new Token(VARIABLE, "TheFingers", 10, 20);
         int expResult = 10;
         int result = instance.getLineNumber();
         assertEquals(expResult, result);
@@ -85,7 +85,7 @@ public class TokenTest {
     @Test
     public void testGetOffset() {
         System.out.println("getOffset");
-        Token instance = new Token(STRING, "The world at your fingers", 10, 20);
+        Token instance = new Token(VARIABLE, "TheFingers", 10, 20);
         int expResult = 20;
         int result = instance.getOffset();
         assertEquals(expResult, result);
